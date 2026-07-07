@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+venv/
+.env
+
+# debug artefacts
+debug_*.py
+debug_*.txt
+debug_*.png
+debug_*.html
+gebiz-watch.zip

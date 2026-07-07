@@ -8,11 +8,13 @@
   ],
 
   "_comment_listing": "Optional fallback while RSS URLs are not set up: public GeBiz pages to scan (best-effort text scan, less reliable than RSS).",
-  "listing_pages": [],
+  "listing_pages": [
+    "https://www.gebiz.gov.sg/ptn/opportunity/BOListing.xhtml"
+  ],
 
   "include_keywords": [
     "container", "modular", "prefab", "prefabricated", "ppvc",
-    "portacabin", "portable cabin", "cabin", "site office",
+    "portacabin", "portable cabin", "site office",
     "temporary office", "temporary building", "temporary structure",
     "temporary classroom", "temporary quarters", "temporary shelter",
     "temporary holding", "temporary facility", "hoarding"
