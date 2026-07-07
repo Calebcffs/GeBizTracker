@@ -1,0 +1,31 @@
+{
+  "_comment_webhook": "Prefer setting env var TEAMS_WEBHOOK_URL (keeps the secret out of this file). Paste here only for quick local tests.",
+  "teams_webhook_url": "",
+
+  "_comment_feeds": "Log in to GeBiz as a Trading Partner > Opportunities search > click the RSS icon on each relevant procurement category, then paste the feed URLs below. Add one block per category (e.g. Construction, Facilities Management, Logistics).",
+  "rss_feeds": [
+    { "name": "PASTE CATEGORY NAME", "url": "PASTE_GEBIZ_RSS_URL_HERE" }
+  ],
+
+  "_comment_listing": "Optional fallback while RSS URLs are not set up: public GeBiz pages to scan (best-effort text scan, less reliable than RSS).",
+  "listing_pages": [],
+
+  "include_keywords": [
+    "container", "modular", "prefab", "prefabricated", "ppvc",
+    "portacabin", "portable cabin", "cabin", "site office",
+    "temporary office", "temporary building", "temporary structure",
+    "temporary classroom", "temporary quarters", "temporary shelter",
+    "temporary holding", "temporary facility", "hoarding"
+  ],
+
+  "exclude_keywords": [
+    "docker", "kubernetes", "containeris", "containeriz",
+    "temporary staff", "temporary manpower", "temporary personnel"
+  ],
+
+  "closing_soon_days": 4,
+  "max_new_items_in_card": 15,
+  "max_closing_items_in_card": 10,
+  "post_when_empty": true,
+  "state_file": "seen_state.json"
+}
