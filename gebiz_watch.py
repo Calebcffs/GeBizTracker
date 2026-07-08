@@ -420,6 +420,8 @@ def update_state(state, matches):
     cutoff_seen = now_sgt() - timedelta(days=180)
     cutoff_closed = now_sgt() - timedelta(days=30)
     for k in list(state.keys()):
+        if k.startswith("_"):   # reserved meta entries (e.g. _meta), not a tracked doc
+            continue
         rec = state[k]
         try:
             first = datetime.fromisoformat(rec.get("first_seen", now_iso))
@@ -624,8 +626,27 @@ def main():
         log("Dry run: not posting, not saving state.")
         return 0
 
+    # Backup-run guard: the workflow is scheduled twice a day (primary + a
+    # backup ~45 min later) so a dropped GitHub run still gets covered. With
+    # post_when_empty=true the digest would otherwise be sent on *both* runs.
+    # Track the last date we posted (persisted in seen_state.json under _meta,
+    # the only file the workflow commits) and skip the second post when we've
+    # already posted today and there is nothing genuinely new to report.
+    today_str = now_sgt().strftime("%Y-%m-%d")
+    meta = state.get("_meta") if isinstance(state.get("_meta"), dict) else {}
+    already_posted_today = meta.get("last_posted_date") == today_str
+    have_new = bool(new_ids)
+
+    skip_reason = None
+    if not (all_matches or errors or cfg["post_when_empty"]):
+        skip_reason = "nothing to report and post_when_empty=false"
+    elif already_posted_today and not have_new:
+        skip_reason = f"already posted on {today_str} and nothing new (backup run)"
+
     posted = True
-    if all_matches or errors or cfg["post_when_empty"]:
+    if skip_reason:
+        log(f"Skipping Teams post: {skip_reason}.")
+    else:
         webhook = os.environ.get("TEAMS_WEBHOOK_URL", "").strip() or cfg.get("teams_webhook_url", "").strip()
         if not webhook or "PASTE" in webhook.upper():
             log("ERROR: no Teams webhook URL set (env TEAMS_WEBHOOK_URL or config). Skipping post.")
@@ -633,13 +654,15 @@ def main():
         else:
             payload = build_adaptive_card(all_matches, new_ids, len(items), errors, cfg)
             posted = post_to_teams(payload, webhook, cfg)
-    else:
-        log("Nothing to report and post_when_empty=false; skipping post.")
+            if posted:
+                meta["last_posted_date"] = today_str
 
     if items:  # only advance state when we actually fetched something
         state = update_state(state, matches)
+        state["_meta"] = meta
         save_state(state_path, state)
-        log(f"State saved: {len(state)} tracked items -> {state_path}")
+        tracked = sum(1 for k in state if not k.startswith("_"))
+        log(f"State saved: {tracked} tracked items -> {state_path}")
 
     return 0 if posted else 1
 

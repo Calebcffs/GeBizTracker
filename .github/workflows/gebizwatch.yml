@@ -2,7 +2,8 @@ name: GeBiz Watch
 
 on:
   schedule:
-    - cron: '30 0 * * *'   # 08:30 SGT (UTC+8) = 00:30 UTC
+    - cron: '30 0 * * *'   # 08:30 SGT (UTC+8) = 00:30 UTC  (primary)
+    - cron: '15 1 * * *'   # 09:15 SGT (UTC+8) = 01:15 UTC  (backup, covers a dropped primary run)
   workflow_dispatch:         # allow manual run from GitHub Actions tab
 
 jobs:
